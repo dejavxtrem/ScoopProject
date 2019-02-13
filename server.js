@@ -53,8 +53,15 @@ const comment = {
 database.comments[comment.id] = comment;
 database.users[comment.username].commentIds.push(comment.id);
 database.articles[comment.articleId].commentIds.push(comment.id);
+
+response.body = {comment: comment};
+response.status = 201;
+  } 
+  else {
+  response.status = 400;
   }
-  //console.log(commentRequest);
+
+  return response;
 }
 
 
