@@ -41,7 +41,7 @@ function creatNewComment ( url, request) {
  const commentRequest = request.body && request.body.comment;
  const response = {};
 
- if (commentRequest && commentRequest.username && database.articles[commentRequest.articleId] && database.users[commentRequest.username]) {
+ if (commentRequest && commentRequest.username && database.articles[commentRequest.articleId] && database.users[commentRequest.username] && commentRequest.body) {
 const comment = {
   id: database.nextCommentId++,
   body: commentRequest.body,
@@ -60,7 +60,7 @@ response.status = 201;
   else {
   response.status = 400;
   }
-
+   //console.log(commentRequest);
   return response;
 }
 
