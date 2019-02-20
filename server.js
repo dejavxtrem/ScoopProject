@@ -381,6 +381,15 @@ function downvote(item, username) {
   return item;
 }
 
+function loadDatabase () {
+  var yaml = require('write-yaml');
+  yaml.sync('theBaseScoop.yml', database);
+}
+
+function loadDatabase () {
+  
+}
+
 // Write all code above this line.
 
 const http = require('http');
