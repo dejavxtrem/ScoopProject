@@ -33,12 +33,21 @@ const routes = {
     'POST': creatNewComment
   },
   '/comments/:id': {
-    'PUT': updateComment
+    'PUT': updateComment,
+    'DELETE':  deleteComment
   },
-  '/comments/:id/upvote': {},
-  '/comments/:id/downvote': {}
+  '/comments/:id/upvote': {
+    'PUT': updateVoteComment,
+  },
+  '/comments/:id/downvote': {
+    'PUT': updateDownComment
+  }
 };
 
+
+// comment route and database code section//
+
+//Post
 function creatNewComment ( url, request) {
  const commentRequest = request.body && request.body.comment;
  const response = {};
@@ -66,6 +75,7 @@ response.status = 201;
   return response;
 }
 
+//PUT
 function updateComment (url, request) {
 const id = Number(url.split('/').filter(segment => segment)[1]);
 const savedComment = database.comments[id];
@@ -86,6 +96,74 @@ else {
 }
   //console.log(savedComment);
   return response;
+}
+
+//DELETE
+function deleteComment (url, request) {
+  const id = Number(url.split('/').filter(segment => segment)[1]);
+  const savedComment = database.comments[id];
+  const response = {};
+
+if (savedComment) {
+  database.comments[id] = null;
+  let userCommentId = database.users[savedComment.username].commentIds;
+  userCommentId.splice(userCommentId.indexOf(id),1);
+
+  let articleCommentIds = database.articles[savedComment.articleId].commentIds
+   articleCommentIds.splice(articleCommentIds.indexOf(id), 1);
+  response.status = 204;
+}else {
+  response.status = 404;
+}
+return response;
+}
+
+//upvote comment
+function updateVoteComment ( url, request) {
+  const id = Number(url.split('/').filter(segment => segment)[1]);
+  const username = request.body && request.body.username;
+  let savedComment = database.comments[id];
+  const response = {};
+
+  if (savedComment && database.users[username]) {
+    if (savedComment.downvotedBy.includes(username)) {
+    savedComment.downvotedBy.splice(savedComment.downvotedBy.indexOf(username), 1);
+    };
+    if (!savedComment.upvotedBy.includes(username)) {
+      savedComment.upvotedBy.push(username);
+      };
+
+      response.body = {comment: savedComment};
+      response.status = 200;
+    }else {
+     response.status = 400;
+  }
+   return response;
+}
+
+//downvote comment
+
+function updateDownComment (url , request) {
+  const id = Number(url.split('/').filter(segment => segment)[1]);
+  const username = request.body && request.body.username;
+  let savedComment = database.comments[id];
+  const response = {};
+
+if (savedComment && database.users[username]) {
+  if (savedComment.upvotedBy.includes(username)) {
+    savedComment.upvotedBy.splice(savedComment.upvotedBy.indexOf(username), 1);
+  }
+
+  if (!savedComment.downvotedBy.includes(username)) {
+    savedComment.downvotedBy.push(username);
+  }
+  response.body = {comment: savedComment};
+  response.status = 200;
+} else {
+   response.status = 400;
+}
+ return response;
+
 }
 
 
