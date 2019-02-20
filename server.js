@@ -381,13 +381,23 @@ function downvote(item, username) {
   return item;
 }
 
-function loadDatabase () {
+function saveDatabase () {
   var yaml = require('write-yaml');
   yaml.sync('theBaseScoop.yml', database);
 }
 
 function loadDatabase () {
+  let read = require('read-yaml')
+  fs = require('fs');
   
+  try {
+    database = read.sync('theBaseScoop.yml');
+  } catch (e){
+    fs.appendFile('theBaseScoop.yml','',function (err) {
+  if (err) throw err;});
+    console.log('here');
+}
+
 }
 
 // Write all code above this line.
